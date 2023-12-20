@@ -1,6 +1,7 @@
 import { PolicyHandler } from '@auth/adapters';
 import { AppAbility, CaslFactory } from '@auth/casl';
 import { POLICY_KEY } from '@auth/decorators/policy.decorator';
+import { JwtPayload } from '@auth/entities';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
@@ -16,8 +17,10 @@ export class PolicyGuard implements CanActivate {
       this.reflector.get<PolicyHandler[]>(POLICY_KEY, context.getHandler()) ||
       [];
 
-    const { user } = context.switchToHttp().getRequest();
-    const ability = this.caslFactory.defineAbility(user);
+    const { payload } = context
+      .switchToHttp()
+      .getRequest<{ payload: JwtPayload }>();
+    const ability = this.caslFactory.defineAbility(payload.auth.role);
 
     return policyHandlers.every((handler) =>
       this.execPolicyHandler(handler, ability),

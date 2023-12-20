@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const payload = await this.jwtHelper.verifyTokenFromRequest(request);
-    request['user'] = payload;
+    request['payload'] = payload;
     return true;
   }
 }
